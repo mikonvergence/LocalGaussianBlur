@@ -6,10 +6,18 @@ __all__ = [
 ]
 
 def gaussian_kernels(stds,size=11):
-    # Takes a series of std values of length N
-    # and integer size corresponding to kernel side length M
-    # and returns a set of gaussian kernels with those stds in a (N,M,M) tensor
+    """ Takes a series of std values of length N
+        and integer size corresponding to kernel side length M
+        and returns a set of gaussian kernels with those stds in a (N,M,M) tensor
     
+    Args:
+        stds (Tensor): Flat list tensor containing std values.
+        size (int): Size of the Gaussian kernel.
+
+    Returns:
+        Tensor: Tensor containing a unique 2D Gaussian kernel for each value in the stds input.
+
+    """  
     # 1. create input vector to the exponential function
     n = (torch.arange(0, size) - (size - 1.0) / 2.0).unsqueeze(-1)
     var = 2*(stds**2).unsqueeze(-1)
@@ -24,8 +32,17 @@ def gaussian_kernels(stds,size=11):
     return kernel_2d
 
 def local_gaussian_blur(input, modulator, kernel_size=11):
-    # Takes an input image and applies a locally-varying gaussian blur
-    # where the modulator signal determines the standard deviation of the gaussian kernel
+    """Blurs image with dynamic Gaussian blur.
+    
+    Args:
+        input (Tensor): The image to be blurred (C,H,W).
+        modulator (Tensor): The modulating signal that determines the local value of kernel variance (H,W).
+        kernel_size (int): Size of the Gaussian kernel.
+
+    Returns:
+        Tensor: Locally blurred version of the input image.
+
+    """   
     
     if len(input.shape) < 4:
         input = input.unsqueeze(0)
@@ -57,7 +74,7 @@ class LocalGaussianBlur(torch.nn.Module):
         kernel_size (int): Size of the Gaussian kernel.
 
     Returns:
-        PIL Image or Tensor: Gaussian blurred version of the input image.
+        Tensor: Gaussian blurred version of the input image.
 
     """     
     
