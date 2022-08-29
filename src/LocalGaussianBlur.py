@@ -20,7 +20,7 @@ def gaussian_kernels(stds,size=11):
     """  
     # 1. create input vector to the exponential function
     n = (torch.arange(0, size) - (size - 1.0) / 2.0).unsqueeze(-1)
-    var = 2*(stds**2).unsqueeze(-1)
+    var = 2*(stds**2).unsqueeze(-1) + 1e-8 # added constant to prevent zero variance
 
     # 2. compute gaussian values with exponential
     kernel_1d = torch.exp((-n**2)/var.t()).permute(1,0)
