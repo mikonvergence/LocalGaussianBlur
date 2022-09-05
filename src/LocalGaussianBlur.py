@@ -3,6 +3,7 @@ from torch import Tensor
 
 __all__ = [
     "LocalGaussianBlur",
+    "local_gaussian_blur"
 ]
 
 def gaussian_kernels(stds,size=11):
@@ -20,7 +21,7 @@ def gaussian_kernels(stds,size=11):
     """  
     # 1. create input vector to the exponential function
     n = (torch.arange(0, size) - (size - 1.0) / 2.0).unsqueeze(-1)
-    var = 2*(stds**2).unsqueeze(-1) + 1e-8 # added constant to prevent zero variance
+    var = 2*(stds**2).unsqueeze(-1) + 1e-8 # add constant for stability
 
     # 2. compute gaussian values with exponential
     kernel_1d = torch.exp((-n**2)/var.t()).permute(1,0)
@@ -56,7 +57,7 @@ def local_gaussian_blur(input, modulator, kernel_size=11):
     kernels = gaussian_kernels(modulator.flatten())
     kernels_rgb = torch.stack(c*[kernels], 1)
     # 3. Unfold input
-    inp_unf = torch.nn.functional.unfold(inp_pad, (kernel_size,kernel_size))
+    inp_unf = torch.nn.functional.unfold(inp_pad, (kernel_size,kernel_size))   
     # 4. Multiply kernel with unfolded
     x1 = inp_unf.view(b,c,-1,h*w)
     x2 = kernels_rgb.view(h*w, c, -1).permute(1,2,0).unsqueeze(0)
